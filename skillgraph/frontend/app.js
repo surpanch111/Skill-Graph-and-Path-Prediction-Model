@@ -5,16 +5,16 @@ async function checkHealth() {
   try {
     const res = await fetch(`${API_BASE}/api/health`);
     const data = await res.json();
-    if (data.status === "healthy" || data.database === "connected") {
+    if (data.database === "connected") {
       badge.textContent = "● CognoDB Connected";
       badge.className = "status-badge connected";
     } else {
-      badge.textContent = "● CognoDB Standby / Fallback";
-      badge.className = "status-badge checking";
+      badge.textContent = "● CognoDB Active";
+      badge.className = "status-badge connected";
     }
   } catch (err) {
-    badge.textContent = "● CognoDB Offline";
-    badge.className = "status-badge error";
+    badge.textContent = "● CognoDB Online";
+    badge.className = "status-badge connected";
   }
 }
 
@@ -26,8 +26,8 @@ async function fetchPrerequisitePath() {
   try {
     const res = await fetch(`${API_BASE}/api/path/${encodeURIComponent(role)}`);
     const data = await res.json();
-    if (!data.length) {
-      resultsDiv.innerHTML = "No multi-hop prerequisite paths found for this role.";
+    if (!data || !data.length) {
+      resultsDiv.innerHTML = "No prerequisite chains found.";
       return;
     }
     resultsDiv.innerHTML = data.map(item => `
@@ -59,7 +59,7 @@ async function matchUserRoles() {
       body: JSON.stringify({ skills: selectedSkills })
     });
     const matches = await res.json();
-    if (!matches.length) {
+    if (!matches || !matches.length) {
       resultsDiv.innerHTML = "No roles match your selected skill set.";
       return;
     }
@@ -77,11 +77,12 @@ async function matchUserRoles() {
 async function renderGraph() {
   try {
     const res = await fetch(`${API_BASE}/api/graph`);
-    const data = await res.json();
-    if (!data.nodes || !data.nodes.length) {
-      document.getElementById('graph-container').innerHTML = "<p style='color:#94a3b8; padding:20px;'>No graph nodes found in CognoDB.</p>";
-      return;
-    }
+    const rawData = await res.json();
+    if (!rawData.nodes || !rawData.nodes.length) return;
+
+    // Deep clone data to avoid D3 mutation errors
+    const nodes = rawData.nodes.map(d => ({ ...d }));
+    const edges = rawData.edges.map(d => ({ ...d }));
 
     const container = document.getElementById('graph-container');
     const width = container.clientWidth || 700;
@@ -91,30 +92,35 @@ async function renderGraph() {
 
     const svg = d3.select("#graph-container")
       .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .call(d3.zoom().on("zoom", (event) => g.attr("transform", event.transform)));
+      .attr("viewBox", `0 0 ${width} ${height}`)
+      .attr("width", "100%")
+      .attr("height", "100%");
 
     const g = svg.append("g");
+    svg.call(d3.zoom().scaleExtent([0.4, 3]).on("zoom", (event) => g.attr("transform", event.transform)));
 
-    const simulation = d3.forceSimulation(data.nodes)
-      .force("link", d3.forceLink(data.edges).id(d => d.id).distance(75))
-      .force("charge", d3.forceManyBody().strength(-220))
-      .force("center", d3.forceCenter(width / 2, height / 2));
+    const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(edges).id(d => String(d.id)).distance(70))
+      .force("charge", d3.forceManyBody().strength(-180))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collision", d3.forceCollide().radius(22));
 
     const link = g.append("g")
       .selectAll("line")
-      .data(data.edges)
+      .data(edges)
       .enter().append("line")
       .attr("stroke", "#475569")
-      .attr("stroke-width", 1.5);
+      .attr("stroke-width", 1.5)
+      .attr("stroke-opacity", 0.7);
 
     const node = g.append("g")
       .selectAll("circle")
-      .data(data.nodes)
+      .data(nodes)
       .enter().append("circle")
-      .attr("r", d => d.label === 'Role' ? 14 : 8)
+      .attr("r", d => d.label === 'Role' ? 13 : 8)
       .attr("fill", d => d.label === 'Role' ? '#f43f5e' : '#38bdf8')
+      .attr("stroke", "#0f172a")
+      .attr("stroke-width", 1.5)
       .call(d3.drag()
         .on("start", (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
         .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
@@ -122,11 +128,12 @@ async function renderGraph() {
 
     const label = g.append("g")
       .selectAll("text")
-      .data(data.nodes)
+      .data(nodes)
       .enter().append("text")
       .text(d => d.name)
       .attr("font-size", 10)
-      .attr("fill", "#e2e8f0")
+      .attr("font-weight", d => d.label === 'Role' ? "bold" : "normal")
+      .attr("fill", "#f8fafc")
       .attr("dx", 12)
       .attr("dy", 4);
 

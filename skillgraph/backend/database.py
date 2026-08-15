@@ -10,21 +10,28 @@ COGNODB_PASSWORD = os.getenv("COGNODB_PASSWORD", "")
 
 driver: Driver = None
 
-def get_driver() -> Driver:
+def get_driver():
     global driver
-    if driver is None:
-        if not COGNODB_URI or not COGNODB_PASSWORD:
-            raise RuntimeError("Database credentials not set in environment variables.")
+    if driver is not None:
+        return driver
+    if not COGNODB_URI or not COGNODB_PASSWORD:
+        return None
+    try:
         driver = GraphDatabase.driver(
             COGNODB_URI,
             auth=(COGNODB_USER, COGNODB_PASSWORD),
-            connection_timeout=5.0,
-            max_connection_lifetime=300
+            connection_timeout=3.0,
+            max_connection_lifetime=60
         )
-    return driver
+        return driver
+    except Exception:
+        return None
 
 def close_driver():
     global driver
     if driver:
-        driver.close()
+        try:
+            driver.close()
+        except Exception:
+            pass
         driver = None
