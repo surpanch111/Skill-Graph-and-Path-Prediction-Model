@@ -4,11 +4,15 @@ async function checkHealth() {
   const badge = document.getElementById('db-status');
   try {
     const res = await fetch(`${API_BASE}/api/health`);
-    if (res.ok) {
+    const data = await res.json();
+    if (data.status === "healthy" || data.database === "connected") {
       badge.textContent = "● CognoDB Connected";
       badge.className = "status-badge connected";
-    } else throw new Error();
-  } catch {
+    } else {
+      badge.textContent = "● CognoDB Standby / Fallback";
+      badge.className = "status-badge checking";
+    }
+  } catch (err) {
     badge.textContent = "● CognoDB Offline";
     badge.className = "status-badge error";
   }

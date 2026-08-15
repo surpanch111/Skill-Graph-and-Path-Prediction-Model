@@ -17,7 +17,9 @@ def get_driver() -> Driver:
             raise RuntimeError("Database credentials not set in environment variables.")
         driver = GraphDatabase.driver(
             COGNODB_URI,
-            auth=(COGNODB_USER, COGNODB_PASSWORD)
+            auth=(COGNODB_USER, COGNODB_PASSWORD),
+            connection_timeout=5.0,
+            max_connection_lifetime=300
         )
     return driver
 
