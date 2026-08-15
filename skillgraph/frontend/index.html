@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillGraph — Graph Career Explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">⚡ SkillGraph</div>
+    <div id="db-status" class="status-badge checking">Connecting to CognoDB...</div>
+  </header>
+
+  <main class="dashboard">
+    <section class="panel control-panel">
+      <h2>1. Multi-Hop Prerequisite Finder</h2>
+      <p class="subtitle">Traverse 2+ hops of transitive prerequisite skill paths</p>
+      <div class="form-group">
+        <select id="role-select">
+          <option value="Autonomous Drone Engineer">Autonomous Drone Engineer</option>
+          <option value="Computer Vision Engineer">Computer Vision Engineer</option>
+          <option value="Backend Systems Engineer">Backend Systems Engineer</option>
+          <option value="Embedded Robotics Engineer">Embedded Robotics Engineer</option>
+          <option value="Wireless Communications Engineer">Wireless Communications Engineer</option>
+        </select>
+        <button onclick="fetchPrerequisitePath()">Trace Path</button>
+      </div>
+      <div id="path-results" class="results-box">Select a role and click Trace Path.</div>
+
+      <hr style="margin: 18px 0; border: 0; border-top: 1px solid #334155;" />
+
+      <h2>2. Skill-Based Role Matcher</h2>
+      <p class="subtitle">Graph pattern matching based on your skill set</p>
+      <div class="checkbox-grid" id="skills-grid">
+        <label><input type="checkbox" value="Python"> Python</label>
+        <label><input type="checkbox" value="C++"> C++</label>
+        <label><input type="checkbox" value="Linear Algebra"> Linear Algebra</label>
+        <label><input type="checkbox" value="Multivariable Calculus"> Calculus</label>
+        <label><input type="checkbox" value="Data Structures & Algorithms"> DSA</label>
+        <label><input type="checkbox" value="Machine Learning Basics"> ML Basics</label>
+        <label><input type="checkbox" value="Deep Learning & PyTorch"> Deep Learning</label>
+        <label><input type="checkbox" value="Computer Vision (OpenCV)"> OpenCV</label>
+        <label><input type="checkbox" value="ROS2 / Robotics Middleware"> ROS2</label>
+        <label><input type="checkbox" value="Embedded Systems & RTOS"> RTOS</label>
+        <label><input type="checkbox" value="PID & Flight Control Systems"> PID Control</label>
+        <label><input type="checkbox" value="Digital Signal Processing"> DSP</label>
+        <label><input type="checkbox" value="RF & Wireless Communication"> RF Comms</label>
+        <label><input type="checkbox" value="Docker & Microservices"> Docker</label>
+        <label><input type="checkbox" value="Cloud & API Integration"> Cloud</label>
+      </div>
+      <button onclick="matchUserRoles()" style="margin-top: 12px; width: 100%;">Calculate Matches</button>
+      <div id="match-results" class="results-box">Select your skills to calculate compatibility.</div>
+    </section>
+
+    <section class="panel visualizer-panel">
+      <div class="panel-header">
+        <h2>Live CognoDB Topology</h2>
+        <span class="legend"><span class="dot role-dot"></span> Role <span class="dot skill-dot"></span> Skill</span>
+      </div>
+      <div id="graph-container"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
