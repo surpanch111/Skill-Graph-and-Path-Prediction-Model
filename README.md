@@ -10,7 +10,8 @@
 🔗 **Live Demo:** https://skillgraphpredictor-app.onrender.com
 *(Hosted on Render. The first load may take ~30–60 seconds if the service has been idle.)*
 
-![SkillGraph Screenshot](docs/screenshot.png)
+<img width="1558" height="787" alt="2026-09-30 (1)" src="https://github.com/user-attachments/assets/6dfbf1b2-1bc8-4a75-968a-84ed2f241345" />
+
 
 ---
 
