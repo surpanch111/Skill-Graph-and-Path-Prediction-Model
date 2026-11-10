@@ -195,9 +195,14 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 👤 Author
+## 👨‍💻 Author & Maintainer
 
-**surpanch111**
-GitHub: [@surpanch111](https://github.com/surpanch111)
+**Anil Sharma**
 
-⭐ If you found this project useful, please give it a star!
+- 🐙 **GitHub**: [@surpanch111](https://github.com/surpanch111)
+- 💼 **LinkedIn**: [Your LinkedIn Profile](https://www.linkedin.com/in/anil-pancholi01)
+- 📧 **Email**: [surpanch111@gmail.com]
+
+⭐ If you find this project useful, consider giving the repository a star and sharing feedback through GitHub Issues.
+
+*Built with ❤️ by Anil Sharma*
